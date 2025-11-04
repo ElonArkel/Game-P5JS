@@ -1,23 +1,21 @@
-class Jogador extends Entidade {
+class Jogador {
   constructor(x, y) {
-    super(x, y);
-    this._vida = 3; // atributo privado
+    this.x = x;
+    this.y = y;
+    this.vel = 2;
+    this.vida = 100;
   }
 
-  get vida() {
-    return this._vida;
-  }
-
-  set vida(v) {
-    this._vida = constrain(v, 0, 5);
-  }
-
-  perderVida() {
-    this._vida--;
+  mover() {
+    if (keyIsDown(LEFT_ARROW)) this.x -= this.vel;
+    if (keyIsDown(RIGHT_ARROW)) this.x += this.vel;
+    if (keyIsDown(UP_ARROW)) this.y -= this.vel;
+    if (keyIsDown(DOWN_ARROW)) this.y += this.vel;
   }
 
   desenhar() {
     fill(0, 255, 0);
-    ellipse(this.x, this.y, 40);
+    noStroke();
+    ellipse(this.x, this.y, 20);
   }
 }

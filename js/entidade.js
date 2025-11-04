@@ -10,6 +10,6 @@ class Entidade {
   }
 
   desenhar() {
-    // Polimorfismo: cada classe filha sobrescreve esse método
+   
   }
 }
