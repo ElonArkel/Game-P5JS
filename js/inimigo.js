@@ -1,11 +1,56 @@
 class Inimigo extends Entidade {
   constructor(x, y) {
     super(x, y);
-    this.forca = int(random(1, 3));
+    this.forca = int(random(1, 3)); //
+    this.vel = 0.8;
+    this.vida = 20
+    this.morto = false;
+  }
+
+  mover(jogador) {
+    if (this.morto) return;
+
+    let dx = jogador.x - this.x;
+    let dy = jogador.y - this.y;
+    let distancia = dist(this.x, this.y, jogador.x, jogador.y);
+    if (distancia > 1) {
+      this.x += (dx / distancia) * this.vel;
+      this.y += (dy / distancia) * this.vel;
+    }
+
+  }
+
+  colisao(jogador) {
+    let d = Utils.distancia(this, jogador);
+    return d < 20; // considerando raio de 10 para ambos
+  }
+
+  damage(valor) {
+    if (this.morto) return;
+    this.vida -= valor;
+    if (this.vida <= 0) {
+      this.morto = true;
+      this.morte();
+    }
+  }
+
+  morte() {
+    setTimeout(() => {
+      this.respawn();
+    }, 2000); // respawn após 2 segundos
+  }
+
+  respawn() {
+    this.x = random(width);
+    this.y = random(height);
+    this.vida = 20;
+    this.morto = false;
   }
 
   desenhar() {
+    if (this.morto) return;
     fill(255, 0, 0);
-    rect(this.x - 15, this.y - 15, 30, 30);
+    noStroke();
+    ellipse(this.x, this.y, 20);
   }
 }

@@ -1,13 +1,15 @@
 let jogador;
+let inimigo;
 let areas = [];
-let gridSize = 3;   // 3x3 células
-let areaSize = 200; // tamanho de cada célula
+let gridSize = 3;
+let areaSize = 200;
 
 function setup() {
   createCanvas(gridSize * areaSize, gridSize * areaSize);
   jogador = new Jogador(width / 2, height / 2);
+  inimigo = new Inimigo(random(width), random(height));
 
-  // cria as células do grid
+  // cria as áreas da grade
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       let x = j * areaSize;
@@ -20,24 +22,41 @@ function setup() {
 function draw() {
   background(30);
 
-  // atualiza jogador
+  // movimentação do jogador
   jogador.mover();
 
-  // desenha todas as áreas
+  // ataque do jogador (espaço)
+  jogador.ataque([inimigo]);
+
+  // movimentação do inimigo
+  inimigo.mover(jogador);
+
+  // dano ao jogador se colidir com inimigo vivo
+  if (!inimigo.morto && inimigo.colisao(jogador)) {
+    jogador.damage(inimigo.forca);
+  }
+
+  // desenha as áreas da grade
   for (let a of areas) a.desenhar();
 
-  // desenha jogador
+  // desenha o jogador e inimigo
   jogador.desenhar();
+  inimigo.desenhar();
 
-  // mostra em qual célula o jogador está
+  // HUD — informações do jogo
+  fill(255);
+  noStroke();
+  textSize(14);
+
+  // exibe célula atual do jogador
   for (let a of areas) {
     if (a.contem(jogador.x, jogador.y)) {
-      fill(255);
-      noStroke();
-      textSize(14);
       text(`Célula: (${a.x / areaSize}, ${a.y / areaSize})`, 10, 20);
-      text(`Vida: ${jogador.vida}`, 10, 40);
       break;
     }
   }
+
+  // mostra status
+  text(`Vida Jogador: ${jogador.vida}`, 10, 40);
+  text(`Vida Inimigo: ${inimigo.morto ? 'Morto' : inimigo.vida}`, 10, 60);
 }
