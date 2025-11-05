@@ -58,5 +58,5 @@ function draw() {
 
   // mostra status
   text(`Vida Jogador: ${jogador.vida}`, 10, 40);
-  text(`Vida Inimigo: ${inimigo.morto ? 'Morto' : inimigo.vida}`, 10, 60);
+  text(`Vida Inimigo: ${inimigo.morto ? "Morto" : inimigo.vida}`, 10, 60);
 }
