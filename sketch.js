@@ -51,7 +51,7 @@ function draw() {
   // exibe célula atual do jogador
   for (let a of areas) {
     if (a.contem(jogador.x, jogador.y)) {
-      text(`Célula: (${a.x / areaSize}, ${a.y / areaSize})`, 10, 20);
+      text(`Célula: (${a.x / areaSize + 1}, ${a.y / areaSize + 1})`, 10, 20);
       break;
     }
   }

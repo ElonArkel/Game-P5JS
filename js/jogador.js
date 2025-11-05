@@ -105,7 +105,7 @@ class Jogador extends Entidade {
     return this.#dano;
   }
   set vel(vel) {
-    return this.#vel;
+    this.#vel = vel;
   }
   set vida(vida) {
     this.#vida = vida;
