@@ -2,7 +2,8 @@ class Area {
   constructor(x, y, size) {
     this.x = x;       // posição no mundo
     this.y = y;
-    this.size = size; // tamanho da célula
+    this.size = size;
+    this.item = false;
   }
 
   desenhar() {

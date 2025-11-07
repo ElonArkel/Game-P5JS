@@ -1,6 +1,7 @@
 let jogador;
 let inimigo;
 let areas = [];
+let itens = [];
 let gridSize = 3;
 let areaSize = 200;
 
@@ -8,7 +9,6 @@ function setup() {
   createCanvas(gridSize * areaSize, gridSize * areaSize);
   jogador = new Jogador(width / 2, height / 2);
   inimigo = new Inimigo(random(width), random(height));
-
   // cria as áreas da grade
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
@@ -42,6 +42,24 @@ function draw() {
   // desenha o jogador e inimigo
   jogador.desenhar();
   inimigo.desenhar();
+
+  for (let item of itens) {
+    item.desenhar();
+    if (!item.coletado && item.colisao(jogador)) {
+      item.coletar(jogador);
+    }
+  }
+
+  // desenha itens coletáveis
+  for (let a of areas) {
+    let d = dist(jogador.x, jogador.y, a.x + areaSize / 2, a.y + areaSize / 2);
+    if (d < 100 && !a.temItem && random() < 0.01) {
+      let ix = a.x + random(40, areaSize - 40);
+      let iy = a.y + random(40, areaSize - 40);
+      itens.push(new Item(ix, iy, "cura"));
+      a.temItem = true;
+    }
+  }
 
   // HUD — informações do jogo
   fill(255);

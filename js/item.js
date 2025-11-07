@@ -1,11 +1,29 @@
 class Item extends Entidade {
-  constructor(x, y) {
+  constructor(x, y, tipo) {
     super(x, y);
-    this.tipo = random(['vida', 'pontos']);
+    this.tipo = tipo;
+    this.x = x;
+    this.y = y;
+    this.tamanho = 15;
+    this.coletado = false;
   }
 
   desenhar() {
-    fill(0, 0, 255);
-    ellipse(this.x, this.y, 20);
+    if (this.coletado) return;
+    if (this.tipo === "cura") fill(0, 200, 255);
+    else if (this.tipo === "pontos") fill(255, 215, 0);
+
+    noStroke();
+    ellipse(this.x, this.y, this.tamanho);
+  }
+
+  colisao(jogador) {
+    return dist(this.x, this.y, jogador.x, jogador.y) < 15;
+  }
+
+  coletar(jogador) {
+    this.coletado = true;
+    if (this.coletado === "cura") jogador.atualizarVida(20);
+    else if (this.coletado === "pontos") jogador.pontos += 10;
   }
 }
