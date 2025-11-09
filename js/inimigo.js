@@ -25,7 +25,7 @@ class Inimigo extends Entidade {
 
   colisao(jogador) {
     let d = Utils.distancia(this, jogador);
-    return d < 20; // considerando raio de 10 para ambos
+    return d < 20;
   }
 
   damage(valor) {
@@ -41,7 +41,7 @@ class Inimigo extends Entidade {
     itens.push(new Item(this.x, this.y, "pontos"));
     setTimeout(() => {
       this.respawn();
-    }, 2000); // respawn após 2 segundos
+    }, 2000);
   }
 
   respawn() {

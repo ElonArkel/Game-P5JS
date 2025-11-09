@@ -1,41 +1,50 @@
 class Jogador {
+  #vel;
+  #vida;
+  #cooldown;
+  #damageCooldown;
+  #estado;
+  #frame;
+  #sprites;
+  #range;
+  #dano;
   constructor(x, y, sprites) {
     this.x = x;
     this.y = y;
-    this.vel = 2;
-    this.vida = 100;
-    this.cooldown = 0;
-    this.damageCooldown = 0;
-    this.estado = "idle";
-    this.frame = 0;
-    this.sprites = sprites;
-    this.range = 50;   // alcance do ataque
-    this.dano = 10;    // dano fixo
+    this.#vel = 2;
+    this.#vida = 100;
+    this.#cooldown = 0;
+    this.#damageCooldown = 0;
+    this.#estado = "idle";
+    this.#frame = 0;
+    this.#sprites = sprites;
+    this.#range = 50;
+    this.#dano = 10;
   }
 
   mover() {
     let movendo = false;
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
-      this.x -= this.vel; // A
+      this.x -= this.#vel; // A
       movendo = true;
     }
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
-      this.x += this.vel;
+      this.x += this.#vel;
       movendo = true;
     }
     if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
-      this.y -= this.vel;
+      this.y -= this.#vel;
       movendo = true;
     }
     if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
-      this.y += this.vel;
+      this.y += this.#vel;
       movendo = true;
     }
 
-    if (this.cooldown > 0) this.cooldown--;
+    if (this.#cooldown > 0) this.#cooldown--;
 
-    if (this.estado !== "attack") {
-      this.estado = movendo ? "walk" : "idle";
+    if (this.#estado !== "attack") {
+      this.#estado = movendo ? "walk" : "idle";
     }
   }
 
@@ -45,14 +54,14 @@ class Jogador {
   }
 
   damage(valor) {
-    if (this.damageCooldown === 0) {
-      this.vida -= valor;
-      this.vida = max(this.vida, 0);
-      this.damageCooldown = 30;
+    if (this.#damageCooldown === 0) {
+      this.#vida -= valor;
+      this.#vida = max(this.#vida, 0);
+      this.#damageCooldown = 30;
     }
   }
   atualizar() {
-    if (this.damageCooldown > 0) this.damageCooldown--; 
+    if (this.#damageCooldown > 0) this.#damageCooldown--;
   }
 
   atualizarVida(amount) {
@@ -61,28 +70,27 @@ class Jogador {
   }
 
   ataque(inimigos) {
-    if (keyIsDown(32) && this.cooldown === 0) { // tecla espaço
-      this.cooldown = 30; // recarga em frames (~0.5s a 60fps)
-      this.estado = "attack";
-      this.frame = 0;
-
+    if (keyIsDown(32) && this.cooldown === 0) {
+      // tecla espaço
+      this.#cooldown = 30; // recarga em frames (~0.5s a 60fps)
+      this.#estado = "attack";
+      this.#frame = 0;
 
       for (let inimigo of inimigos) {
         let d = Utils.distancia(this, inimigo);
-        if (d < this.range && !inimigo.morto) {
+        if (d < this.#range && !inimigo.morto) {
           inimigo.damage(this.dano); // aplica dano numérico
         }
       }
 
       setTimeout(() => {
-        if (this.estado === "attack")
-          this.estado = "idle";
+        if (this.#estado === "attack") this.#estado = "idle";
       }, 400);
     }
   }
 
   desenhar() {
-    let anim = this.sprites[this.estado];
+    let anim = this.#sprites[this.#estado];
     if (!anim || anim.length === 0) return;
 
     if (frameCount % 5 === 0) {
@@ -110,6 +118,18 @@ class Jogador {
   get dano() {
     return this.#dano;
   }
+  get damageCooldown() {
+    return this.#damageCooldown;
+  }
+  get estado() {
+    return this.#estado;
+  }
+  get frame() {
+    return this.#frame;
+  }
+  get sprites() {
+    return this.#sprites;
+  }
   set vel(vel) {
     this.#vel = vel;
   }
@@ -124,5 +144,17 @@ class Jogador {
   }
   set dano(dano) {
     this.#dano = dano;
+  }
+  set damageCooldown(damageCooldown) {
+    this.#damageCooldown = damageCooldown;
+  }
+  set estado(estado) {
+    this.#estado = estado;
+  }
+  set frame(frame) {
+    this.#frame = frame;
+  }
+  set sprites(sprites) {
+    this.#sprites = sprites;
   }
 }
