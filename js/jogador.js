@@ -1,21 +1,42 @@
 class Jogador {
-  constructor(x, y) {
+  constructor(x, y, sprites) {
     this.x = x;
     this.y = y;
     this.vel = 2;
     this.vida = 100;
     this.cooldown = 0;
+    this.damageCooldown = 0;
+    this.estado = "idle";
+    this.frame = 0;
+    this.sprites = sprites;
     this.range = 50;   // alcance do ataque
     this.dano = 10;    // dano fixo
   }
 
   mover() {
-    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) this.x -= this.vel; // A
-    if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) this.x += this.vel; // D
-    if (keyIsDown(UP_ARROW) || keyIsDown(87)) this.y -= this.vel; // W
-    if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) this.y += this.vel; // S
+    let movendo = false;
+    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+      this.x -= this.vel; // A
+      movendo = true;
+    }
+    if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
+      this.x += this.vel;
+      movendo = true;
+    }
+    if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
+      this.y -= this.vel;
+      movendo = true;
+    }
+    if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
+      this.y += this.vel;
+      movendo = true;
+    }
 
     if (this.cooldown > 0) this.cooldown--;
+
+    if (this.estado !== "attack") {
+      this.estado = movendo ? "walk" : "idle";
+    }
   }
 
   colisao(inimigo) {
@@ -23,11 +44,15 @@ class Jogador {
     return d < 20;
   }
 
-  damage(inimigo) {
-    if (inimigo && !inimigo.morto) {
-      this.vida -= inimigo.forca;
+  damage(valor) {
+    if (this.damageCooldown === 0) {
+      this.vida -= valor;
       this.vida = max(this.vida, 0);
+      this.damageCooldown = 30;
     }
+  }
+  atualizar() {
+    if (this.damageCooldown > 0) this.damageCooldown--; 
   }
 
   atualizarVida(amount) {
@@ -38,41 +63,36 @@ class Jogador {
   ataque(inimigos) {
     if (keyIsDown(32) && this.cooldown === 0) { // tecla espaço
       this.cooldown = 30; // recarga em frames (~0.5s a 60fps)
-      let acertou = false;
+      this.estado = "attack";
+      this.frame = 0;
+
 
       for (let inimigo of inimigos) {
         let d = Utils.distancia(this, inimigo);
         if (d < this.range && !inimigo.morto) {
           inimigo.damage(this.dano); // aplica dano numérico
-          acertou = true;
         }
       }
 
-      // desenha o círculo de ataque brevemente
-      if (acertou) {
-        this.mostrarRangeAtaque();
-      }
+      setTimeout(() => {
+        if (this.estado === "attack")
+          this.estado = "idle";
+      }, 400);
     }
-  }
-
-  mostrarRangeAtaque() {
-    push();
-    noFill();
-    stroke(0, 255, 0);
-    strokeWeight(2);
-    ellipse(this.x, this.y, this.range * 2);
-    pop();
   }
 
   desenhar() {
-    fill(0, 255, 0);
-    noStroke();
-    ellipse(this.x, this.y, 20);
+    let anim = this.sprites[this.estado];
+    if (!anim || anim.length === 0) return;
 
-    // visual opcional de cooldown
-    if (this.cooldown > 0) {
-      fill(0, 255, 0, 100);
-      arc(this.x, this.y, 22, 22, -HALF_PI, -HALF_PI + TWO_PI * (1 - this.cooldown / 30));
+    if (frameCount % 5 === 0) {
+      this.frame = (this.frame + 1) % anim.length;
     }
+
+    let img = anim[this.frame];
+    if (!img) return; // evita erro
+
+    imageMode(CENTER);
+    image(img, this.x, this.y, 60, 60);
   }
 }

@@ -22,8 +22,8 @@ class Item extends Entidade {
   }
 
   coletar(jogador) {
+    if (this.tipo === "cura") jogador.atualizarVida(20);
+    else if (this.tipo === "pontos") jogador.pontos += 10;
     this.coletado = true;
-    if (this.coletado === "cura") jogador.atualizarVida(20);
-    else if (this.coletado === "pontos") jogador.pontos += 10;
   }
 }
