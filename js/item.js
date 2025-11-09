@@ -1,7 +1,7 @@
 class Item extends Entidade {
   constructor(x, y) {
     super(x, y);
-    this.tipo = random(['vida', 'pontos']);
+    this.tipo = random(["vida", "pontos"]);
   }
 
   desenhar() {
