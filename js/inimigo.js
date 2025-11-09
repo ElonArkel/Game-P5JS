@@ -38,6 +38,7 @@ class Inimigo extends Entidade {
   }
 
   morte() {
+    itens.push(new Item(this.x, this.y, "pontos"));
     setTimeout(() => {
       this.respawn();
     }, 2000); // respawn após 2 segundos
