@@ -7,29 +7,31 @@ let areaSize = 200;
 let cooldown = 0;
 let estado = "menu"; // menu, jogo, vitoria, derrota ou pausado
 let sprites = {
-  idle: [],
-  walk: [],
-  attack: [],
+  idle_mc: [],
+  idle_enemy: [],
+  walk_mc: [],
+  walk_enemy: [],
+  attack_mc: [],
+  attack_enemy: [],
 };
 
 function preload() {
   for (let i = 0; i <= 11; i++) {
-    sprites.attack.push(
-      loadImage(`assets/Golem1/Attacking/Golem_01_Attacking_0${i}.png`)
-    );
-    sprites.idle.push(loadImage(`assets/Golem1/Idle/Golem_01_Idle_0${i}.png`));
+    sprites.attack_mc.push(loadImage(`assets/Golem1/Attacking/Golem_01_Attacking_0${i}.png`));
+    sprites.idle_mc.push(loadImage(`assets/Golem1/Idle/Golem_01_Idle_0${i}.png`));
+    sprites.idle_enemy.push(loadImage(`assets/Golem2/Idle/Golem_02_Idle_0${i}.png`));
+    sprites.attack_enemy.push(loadImage(`assets/Golem2/Attacking/Golem_02_Attacking_0${i}.png`));
   }
   for (let i = 0; i <= 17; i++) {
-    sprites.walk.push(
-      loadImage(`assets/Golem1/Walking/Golem_01_Walking_0${i}.png`)
-    );
+    sprites.walk_mc.push(loadImage(`assets/Golem1/Walking/Golem_01_Walking_0${i}.png`));
+    sprites.walk_enemy.push(loadImage(`assets/Golem2/Walking/Golem_02_Walking_0${i}.png`));
   }
 }
 
 function setup() {
   createCanvas(gridSize * areaSize, gridSize * areaSize);
   jogador = new Jogador(width / 2, height / 2, sprites);
-  inimigo = new Inimigo(random(width), random(height));
+  inimigo = new Inimigo(random(width), random(height), sprites);
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       let x = j * areaSize;
@@ -50,6 +52,7 @@ function draw() {
       reiniciarJogo();
       estado = "jogo";
     }
+    return;
   }
 
   if (estado == "jogo" && keyIsPressed && keyCode === ESCAPE) {
@@ -72,6 +75,7 @@ function draw() {
     jogador.mover();
     jogador.ataque([inimigo]);
     inimigo.mover(jogador);
+    inimigo.atacar(jogador);
 
     if (!inimigo.morto && inimigo.colisao(jogador)) {
       jogador.damage(inimigo.forca);
@@ -166,7 +170,7 @@ function draw() {
 
 function reiniciarJogo() {
   jogador = new Jogador(width / 2, height / 2, sprites);
-  inimigo = new Inimigo(random(width), random(height));
+  inimigo = new Inimigo(random(width), random(height), sprites);
   itens = [];
   estado = "jogo";
 }

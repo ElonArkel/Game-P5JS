@@ -15,7 +15,7 @@ class Jogador extends Entidade {
     this.#vida = 100;
     this.#cooldown = 0;
     this.#damageCooldown = 0;
-    this.#estado = "idle";
+    this.#estado = "idle_mc";
     this.#frame = 0;
     this.#sprites = sprites;
     this.#range = 50;
@@ -43,8 +43,8 @@ class Jogador extends Entidade {
 
     if (this.#cooldown > 0) this.#cooldown--;
 
-    if (this.#estado !== "attack") {
-      this.#estado = movendo ? "walk" : "idle";
+    if (this.#estado !== "attack_mc") {
+      this.#estado = movendo ? "walk_mc" : "idle_mc";
     }
   }
 
@@ -72,7 +72,7 @@ class Jogador extends Entidade {
   ataque(inimigos) {
     if (keyIsDown(32) && this.#cooldown === 0) {
       this.#cooldown = 30;
-      this.#estado = "attack";
+      this.#estado = "attack_mc";
       this.#frame = 0;
 
       for (let inimigo of inimigos) {
@@ -83,7 +83,7 @@ class Jogador extends Entidade {
       }
 
       setTimeout(() => {
-        if (this.#estado === "attack") this.#estado = "idle";
+        if (this.#estado === "attack_mc") this.#estado = "idle_mc";
       }, 400);
     }
   }
