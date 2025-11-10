@@ -15,7 +15,7 @@ let sprites = {
 function preload() {
   for (let i = 0; i <= 11; i++) {
     sprites.attack.push(
-      loadImage(`assets/Golem1/Attacking/Golem _01_Attacking_0${i}.png`)
+      loadImage(`assets/Golem1/Attacking/Golem_01_Attacking_0${i}.png`)
     );
     sprites.idle.push(loadImage(`assets/Golem1/Idle/Golem_01_Idle_0${i}.png`));
   }
@@ -40,6 +40,18 @@ function setup() {
 }
 
 function draw() {
+  if (estado == "menu") {
+    background(30);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    text("Pressione ENTER para começar", width / 2, height / 2);
+    if (keyIsPressed && keyCode === ENTER) {
+      reiniciarJogo();
+      estado = "jogo";
+    }
+  }
+
   if (estado == "jogo" && keyIsPressed && keyCode === ESCAPE) {
     estado = "pausado";
   } else if (estado == "pausado" && keyIsPressed && keyCode === ESCAPE) {
@@ -70,17 +82,6 @@ function draw() {
     jogador.desenhar();
     inimigo.desenhar();
     jogador.atualizar();
-
-    if (!inimigo.morto && inimigo.colisao(jogador)) {
-      jogador.damage(inimigo.forca);
-    }
-
-    for (let item of itens) {
-      item.desenhar();
-      if (!item.coletado && item.colisao(jogador)) {
-        item.coletar(jogador);
-      }
-    }
 
     for (let item of itens) {
       item.desenhar();
@@ -135,9 +136,10 @@ function draw() {
     }
 
     text(`Vida Jogador: ${jogador.vida}`, 65, 40);
-    text(`Vida Inimigo: ${inimigo.morto ? "Morto" : inimigo.vida}`, 58.5, 60);
+    text(`Vida Inimigo: ${inimigo.morto ? 0 : inimigo.vida}`, 58.5, 60);
+    text(`Pontos: ${jogador.pontos}`, 41, 80);
 
-    if (inimigo.morto) {
+    if (jogador.pontos == 100) {
       estado = "vitoria";
       background(30, 30, 30, 200);
       fill(0, 255, 0);
@@ -153,7 +155,7 @@ function draw() {
   }
   if (estado === "vitoria" || estado === "derrota") {
     text("Pressione R para reiniciar", width / 2, height / 2);
-    text("Pressione ESC para reiniciar", width / 2, height / 2 + 40);
+    text("Pressione ESC para ir ao menu pricipal", width / 2, height / 2 + 40);
     if (keyIsDown(82)) {
       reiniciarJogo();
     } else if (keyIsDown(ESCAPE)) {
@@ -163,7 +165,8 @@ function draw() {
 }
 
 function reiniciarJogo() {
-  jogador = new Jogador(width / 2, height / 2);
+  jogador = new Jogador(width / 2, height / 2, sprites);
   inimigo = new Inimigo(random(width), random(height));
+  itens = [];
   estado = "jogo";
 }

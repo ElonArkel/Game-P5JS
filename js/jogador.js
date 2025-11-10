@@ -1,4 +1,4 @@
-class Jogador {
+class Jogador extends Entidade {
   #vel;
   #vida;
   #cooldown;
@@ -9,8 +9,8 @@ class Jogador {
   #range;
   #dano;
   constructor(x, y, sprites) {
-    this.x = x;
-    this.y = y;
+    super(x, y);
+    this.pontos = 0;
     this.#vel = 2;
     this.#vida = 100;
     this.#cooldown = 0;
@@ -25,7 +25,7 @@ class Jogador {
   mover() {
     let movendo = false;
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
-      this.x -= this.#vel; // A
+      this.x -= this.#vel;
       movendo = true;
     }
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
@@ -70,16 +70,15 @@ class Jogador {
   }
 
   ataque(inimigos) {
-    if (keyIsDown(32) && this.cooldown === 0) {
-      // tecla espaço
-      this.#cooldown = 30; // recarga em frames (~0.5s a 60fps)
+    if (keyIsDown(32) && this.#cooldown === 0) {
+      this.#cooldown = 30;
       this.#estado = "attack";
       this.#frame = 0;
 
       for (let inimigo of inimigos) {
         let d = Utils.distancia(this, inimigo);
         if (d < this.#range && !inimigo.morto) {
-          inimigo.damage(this.dano); // aplica dano numérico
+          inimigo.damage(this.#dano);
         }
       }
 
@@ -94,11 +93,11 @@ class Jogador {
     if (!anim || anim.length === 0) return;
 
     if (frameCount % 5 === 0) {
-      this.frame = (this.frame + 1) % anim.length;
+      this.#frame = (this.#frame + 1) % anim.length;
     }
 
-    let img = anim[this.frame];
-    if (!img) return; // evita erro
+    let img = anim[this.#frame];
+    if (!img) return;
 
     imageMode(CENTER);
     image(img, this.x, this.y, 60, 60);

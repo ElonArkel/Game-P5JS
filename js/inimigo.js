@@ -5,7 +5,7 @@ class Inimigo extends Entidade {
   #morto;
   constructor(x, y) {
     super(x, y);
-    this.#forca = int(random(1, 3));
+    this.#forca = 15;
     this.#vel = 0.8;
     this.#vida = 20;
     this.#morto = false;
