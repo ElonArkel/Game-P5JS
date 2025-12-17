@@ -2,8 +2,6 @@ class Item extends Entidade {
   constructor(x, y, tipo) {
     super(x, y);
     this.tipo = tipo;
-    this.x = x;
-    this.y = y;
     this.tamanho = 15;
     this.coletado = false;
   }
