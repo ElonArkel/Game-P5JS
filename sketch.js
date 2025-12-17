@@ -1,9 +1,11 @@
 let jogador;
 let inimigo;
 let areas = [];
+let grid;
 let itens = [];
-let gridSize = 3;
-let areaSize = 200;
+let gridCols = 30;
+let gridRows = 30;
+let cellSize = 20;
 let cooldown = 0;
 let estado = "menu"; // menu, jogo, vitoria, derrota ou pausado
 let sprites = {
@@ -29,15 +31,22 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(gridSize * areaSize, gridSize * areaSize);
+  createCanvas(600, 600);
+
+  grid = new Grid(gridCols, gridRows, cellSize);
+
   jogador = new Jogador(width / 2, height / 2, sprites);
-  inimigo = new Inimigo(random(width), random(height), sprites);
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      let x = j * areaSize;
-      let y = i * areaSize;
-      areas.push(new Area(x, y, areaSize));
-    }
+  inimigo = new Inimigo(random(width), random(height), sprites, grid);
+  carregarPresetObstaculos(1);
+}
+
+function desenharGrid() {
+  stroke(50);
+  for (let i = 0; i <= grid.cols; i++) {
+    line(i * cellSize, 0, i * cellSize, height);
+  }
+  for (let j = 0; j <= grid.rows; j++) {
+    line(0, j * cellSize, width, j * cellSize);
   }
 }
 
@@ -55,6 +64,8 @@ function draw() {
     return;
   }
 
+
+
   if (estado == "jogo" && keyIsPressed && keyCode === ESCAPE) {
     estado = "pausado";
   } else if (estado == "pausado" && keyIsPressed && keyCode === ESCAPE) {
@@ -71,9 +82,12 @@ function draw() {
 
   if (estado == "jogo") {
     background(30);
-
+    desenharGrid();
+    desenharBloqueios();
     jogador.mover();
     jogador.ataque([inimigo]);
+    jogador.atualizar();
+
     inimigo.mover(jogador);
     inimigo.atacar(jogador);
 
@@ -83,9 +97,17 @@ function draw() {
 
     for (let a of areas) a.desenhar();
 
+    stroke(0, 255, 0);
+    noFill();
+    if (inimigo.path) {
+      for (let p of inimigo.path) {
+        let pos = grid.gridToWorld(p.i, p.j);
+        ellipse(pos.x, pos.y, 10);
+      }
+    }
+
     jogador.desenhar();
     inimigo.desenhar();
-    jogador.atualizar();
 
     for (let item of itens) {
       item.desenhar();
@@ -97,25 +119,13 @@ function draw() {
     itens = itens.filter((i) => !i.coletado);
 
     for (let a of areas) {
-      if (
-        a.temItem &&
-        !itens.some(
-          (i) =>
-            i.x > a.x &&
-            i.x < a.x + areaSize &&
-            i.y > a.y &&
-            i.y < a.y + areaSize
-        )
-      ) {
-        a.temItem = false;
-      }
-
       let d = dist(
         jogador.x,
         jogador.y,
         a.x + areaSize / 2,
         a.y + areaSize / 2
       );
+
       if (d < 100 && !a.temItem && random() < 0.01) {
         let ix = a.x + random(40, areaSize - 40);
         let iy = a.y + random(40, areaSize - 40);
@@ -170,7 +180,79 @@ function draw() {
 
 function reiniciarJogo() {
   jogador = new Jogador(width / 2, height / 2, sprites);
-  inimigo = new Inimigo(random(width), random(height), sprites);
+  inimigo = new Inimigo(random(width), random(height), sprites, grid);
   itens = [];
   estado = "jogo";
+}
+
+function bloquearAreaWorld(x, y, w, h) {
+  let start = grid.worldToGrid(x, y);
+  let end = grid.worldToGrid(x + w, y + h);
+
+  for (let i = start.i; i <= end.i; i++) {
+    for (let j = start.j; j <= end.j; j++) {
+      if (
+        i >= 0 && j >= 0 &&
+        i < grid.rows && j < grid.cols
+      ) {
+        grid.map[i][j] = 1;
+      }
+    }
+  }
+}
+
+function desenharBloqueios() {
+  noStroke();
+  fill(200, 50, 50, 150); // vermelho translúcido
+
+  for (let i = 0; i < grid.rows; i++) {
+    for (let j = 0; j < grid.cols; j++) {
+      if (grid.map[i][j] === 1) {
+        rect(
+          j * cellSize,
+          i * cellSize,
+          cellSize,
+          cellSize
+        );
+      }
+    }
+  }
+}
+
+function carregarPresetObstaculos(preset) {
+
+  for (let i = 0; i < grid.rows; i++) {
+    for (let j = 0; j < grid.cols; j++) {
+      grid.map[i][j] = 0;
+    }
+  }
+
+
+
+  if (preset === 1) {
+
+    bloquearAreaWorld(150, 100, 120, 60);
+    bloquearAreaWorld(300, 250, 40, 200);
+  }
+
+  if (preset === 2) {
+
+    bloquearAreaWorld(200, 0, 40, 600);
+    bloquearAreaWorld(0, 300, 600, 40);
+  }
+
+  if (preset === 3) {
+
+    bloquearAreaWorld(100, 100, 400, 40);
+    bloquearAreaWorld(100, 460, 400, 40);
+    bloquearAreaWorld(100, 140, 40, 280);
+    bloquearAreaWorld(460, 140, 40, 200);
+  }
+
+  if (preset === 4) {
+    bloquearAreaWorld(100, 100, 60, 60);
+    bloquearAreaWorld(200, 150, 60, 60);
+    bloquearAreaWorld(300, 200, 60, 60);
+    bloquearAreaWorld(400, 250, 60, 60);
+  }
 }

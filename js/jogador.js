@@ -20,16 +20,19 @@ class Jogador extends Entidade {
     this.#sprites = sprites;
     this.#range = 50;
     this.#dano = 10;
+    this.direcao = 1;
   }
 
   mover() {
     let movendo = false;
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
       this.x -= this.#vel;
+      this.direcao = -1;
       movendo = true;
     }
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
       this.x += this.#vel;
+      this.direcao = 1;
       movendo = true;
     }
     if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
@@ -92,16 +95,24 @@ class Jogador extends Entidade {
     let anim = this.#sprites[this.#estado];
     if (!anim || anim.length === 0) return;
 
+    // garante que o frame é válido
+    this.#frame = this.#frame % anim.length;
+    let img = anim[this.#frame];
+    if (!img) return;
+
     if (frameCount % 5 === 0) {
       this.#frame = (this.#frame + 1) % anim.length;
     }
 
-    let img = anim[this.#frame];
-    if (!img) return;
-
     imageMode(CENTER);
-    image(img, this.x, this.y, 60, 60);
+    push();
+    translate(this.x, this.y);
+    scale(this.direcao, 1);
+    image(img, 0, 0, 60, 60);
+    pop();
   }
+
+
   get vel() {
     return this.#vel;
   }
