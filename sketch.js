@@ -37,7 +37,7 @@ function setup() {
 
   jogador = new Jogador(width / 2, height / 2, sprites);
   inimigo = new Inimigo(random(width), random(height), sprites, grid);
-  carregarPresetObstaculos(1);
+  carregarPresetObstaculos(3);
 }
 
 function desenharGrid() {
